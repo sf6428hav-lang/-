@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     gemini_api_base_url: str = "https://generativelanguage.googleapis.com"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-pro"
+    media_parser_url: str = "http://localhost:8051"
     port: int = 8000
     
     # Paths

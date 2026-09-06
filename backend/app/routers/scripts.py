@@ -38,7 +38,7 @@ async def generate_scripts(request: GenerateRequest):
 
                 # Generate
                 yield _sse({"type": "progress", "index": idx, "status": "generating", "message": "Generating script with Gemini..."})
-                script_text = await generate_script(video_path)
+                script_text = generate_script(video_path)
 
                 # Save
                 script_file = settings.scripts_dir / f"{record_id}.txt"

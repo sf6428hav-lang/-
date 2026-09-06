@@ -1,64 +1,96 @@
-import os
 import base64
+import tempfile
+import subprocess
 from pathlib import Path
 from openai import OpenAI
 from ..config import settings
 from ..prompt_template import MAHJONG_PROMPT
 
-
-def normalize_base_url(url: str) -> str:
-    """确保 base_url 以 /v1 结尾，兼容各种中转站格式。"""
-    url = url.rstrip('/')
-    if not url.endswith('/v1'):
-        url = url + '/v1'
-    return url
+FFMPEG = "C:\\Program Files\\EVCapture\\ffmpeg.exe"
 
 
 def generate_script(video_path: Path, custom_prompt: str = None) -> str:
-    """Send video to Gemini via OpenAI-compatible API and get formatted script."""
-
+    """Extract audio (MP3) + frames (1fps JPEG) from video, send to Gemini.
+    
+    This avoids the 413 request body limit by using small audio + image files
+    instead of a large video file.
+    """
     if not settings.gemini_api_key:
         raise ValueError("Gemini API Key not configured. Please set GEMINI_API_KEY in .env")
 
     client = OpenAI(
         api_key=settings.gemini_api_key,
-        base_url=normalize_base_url(settings.gemini_api_base_url),
+        base_url=settings.gemini_api_base_url
     )
 
     prompt = custom_prompt or MAHJONG_PROMPT
 
-    # Read video file and encode as base64
-    video_data = video_path.read_bytes()
-    video_b64 = base64.b64encode(video_data).decode('utf-8')
-
-    # Determine MIME type
-    suffix = video_path.suffix.lower()
-    mime_map = {
-        '.mp4': 'video/mp4',
-        '.mov': 'video/quicktime',
-        '.avi': 'video/x-msvideo',
-        '.webm': 'video/webm',
-        '.mkv': 'video/x-matroska',
-    }
-    mime_type = mime_map.get(suffix, 'video/mp4')
-
-    response = client.chat.completions.create(
-        model=settings.gemini_model or "gemini-1.5-pro",
-        messages=[
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        
+        # 1. Extract audio as MP3
+        audio_path = tmpdir / "audio.mp3"
+        subprocess.run([
+            FFMPEG, "-y", "-i", str(video_path),
+            "-vn", "-c:a", "libmp3lame", "-b:a", "32k", "-ac", "1",
+            str(audio_path)
+        ], capture_output=True, check=True)
+        
+        audio_data = audio_path.read_bytes()
+        audio_b64 = base64.b64encode(audio_data).decode('utf-8')
+        print(f"Audio: {len(audio_data) / 1024:.0f} KB")
+        
+        # 2. Extract frames at 1fps, 480p, JPEG quality 10
+        frames_dir = tmpdir / "frames"
+        frames_dir.mkdir()
+        subprocess.run([
+            FFMPEG, "-y", "-i", str(video_path),
+            "-vf", "fps=1,scale=480:-2", "-q:v", "10",
+            str(frames_dir / "frame_%04d.jpg")
+        ], capture_output=True, check=True)
+        
+        frames = sorted(frames_dir.glob("frame_*.jpg"))
+        total_frames = len(frames)
+        total_frame_size = sum(f.stat().st_size for f in frames)
+        print(f"Frames: {total_frames} images, {total_frame_size / 1024:.0f} KB total")
+        
+        # 3. Build content array: audio + all frames + text prompt
+        content_parts = [
             {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "video",
-                        "video": f"data:{mime_type};base64,{video_b64}"
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
+                "type": "input_audio",
+                "input_audio": {
+                    "data": audio_b64,
+                    "format": "mp3"
+                }
             }
         ]
-    )
-
-    return response.choices[0].message.content
+        
+        for i, frame_path in enumerate(frames):
+            frame_data = frame_path.read_bytes()
+            frame_b64 = base64.b64encode(frame_data).decode('utf-8')
+            content_parts.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{frame_b64}",
+                    "detail": "low"
+                }
+            })
+        
+        content_parts.append({
+            "type": "text",
+            "text": prompt
+        })
+        
+        total_size = len(audio_data) + total_frame_size
+        print(f"Total payload: {total_size / 1024 / 1024:.2f} MB (base64: ~{total_size * 1.37 / 1024 / 1024:.2f} MB)")
+        
+        # 4. Send to Gemini
+        response = client.chat.completions.create(
+            model=settings.gemini_model or "gemini-1.5-pro",
+            messages=[{
+                "role": "user",
+                "content": content_parts
+            }]
+        )
+        
+        return response.choices[0].message.content

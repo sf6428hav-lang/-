@@ -1,59 +1,46 @@
 import httpx
-import re
+from ..config import settings
 from .parser import ParseResult
 
 async def parse_douyin(url: str) -> ParseResult:
-    """Parse Douyin short drama link.
+    """Use media-parser to parse Douyin video links.
+    media-parser is a local service that extracts video URLs
+    from Douyin/TikTok and 50+ other platforms without cookies."""
+    api_url = f"{settings.media_parser_url}/api/parse"
     
-    This is a placeholder implementation. In production, this would use
-    yzfly/douyin-mcp-server or Douyin_TikTok_Download_API.
-    """
-    headers = {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
-                      "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-        "Referer": "https://www.douyin.com/",
-    }
-
-    # First, resolve short link to full URL
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         try:
-            resp = await client.get(url, headers=headers)
-            final_url = str(resp.url)
+            resp = await client.post(api_url, json={"text": url})
+            resp.raise_for_status()
+            data = resp.json()
+            
+            if not data.get("succ"):
+                raise ValueError(f"Media-parser error: {data.get('retdesc', 'Unknown error')}")
+            
+            result = data.get("data", {})
+            video_url = result.get("video_url", "")
+            title = result.get("title", "")
+            platform = result.get("platform", "douyin")
+            
+            if not video_url:
+                raise ValueError("Media-parser did not return a video URL")
+            
+            metadata = {
+                "author": result.get("author", {}),
+                "video_id": result.get("video_id", ""),
+                "cover_url": result.get("cover_url", ""),
+                "audio_url": result.get("audio_url", ""),
+                "image_list": result.get("image_list", [])
+            }
+            
+            return ParseResult(
+                platform=platform,
+                video_url=video_url,
+                title=title,
+                metadata=metadata
+            )
+            
+        except httpx.HTTPError as e:
+            raise ValueError(f"Media-parser request failed: {e}")
         except Exception as e:
-            raise ValueError(f"Failed to resolve Douyin URL: {e}")
-
-    # Try to extract video info from the page
-    html = resp.text if hasattr(resp, 'text') else ""
-    
-    video_url = None
-    title = ""
-
-    # Look for video URLs in page content
-    patterns = [
-        r'playAddr[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
-        r'play_url[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
-        r'src[\'":\s]*[\'"]?(https?://[^\'"\s]+\.mp4[^\'"\s]*)',
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, html)
-        if match:
-            video_url = match.group(1)
-            break
-
-    # Extract title
-    m = re.search(r"<title>([^<]+)</title>", html)
-    if m:
-        title = m.group(1)
-
-    if not video_url:
-        raise ValueError(
-            "Could not extract Douyin video URL. "
-            "Please ensure douyin-mcp-server or Douyin_TikTok_Download_API is configured."
-        )
-
-    return ParseResult(
-        platform="douyin",
-        video_url=video_url,
-        title=title or "Unknown Drama",
-        metadata={"source_url": url}
-    )
+            raise ValueError(f"Douyin video parse failed: {e}")
