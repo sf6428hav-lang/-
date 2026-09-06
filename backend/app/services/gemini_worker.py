@@ -6,6 +6,14 @@ from ..config import settings
 from ..prompt_template import MAHJONG_PROMPT
 
 
+def normalize_base_url(url: str) -> str:
+    """确保 base_url 以 /v1 结尾，兼容各种中转站格式。"""
+    url = url.rstrip('/')
+    if not url.endswith('/v1'):
+        url = url + '/v1'
+    return url
+
+
 def generate_script(video_path: Path, custom_prompt: str = None) -> str:
     """Send video to Gemini via OpenAI-compatible API and get formatted script."""
 
@@ -14,7 +22,7 @@ def generate_script(video_path: Path, custom_prompt: str = None) -> str:
 
     client = OpenAI(
         api_key=settings.gemini_api_key,
-        base_url=settings.gemini_api_base_url,
+        base_url=normalize_base_url(settings.gemini_api_base_url),
     )
 
     prompt = custom_prompt or MAHJONG_PROMPT

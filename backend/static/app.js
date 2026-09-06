@@ -340,7 +340,7 @@ function saveSettings() {
     return;
   }
 
-  var model = document.getElementById('modelName').value.trim() || 'gemini-1.5-pro';
+  var model = document.getElementById('modelName').value || 'gemini-1.5-pro';
   var payload = { api_base_url: url, api_key: key || '****', model_name: model, prompt_template: 'default' };
 
   fetch('/api/settings', {
@@ -359,6 +359,53 @@ function saveSettings() {
     });
 }
 
+
+var _pendingModelName = '';
+
+function fetchModels() {
+  var baseUrl = document.getElementById('apiUrl').value.trim();
+  var key = document.getElementById('apiKey').value.trim();
+
+  if (!baseUrl && !key) {
+    toast('请先填写 API Base URL 和 Key');
+    return;
+  }
+
+  var params = '';
+  if (baseUrl) params += 'api_base_url=' + encodeURIComponent(baseUrl);
+  if (key) params += (params ? '&' : '') + 'api_key=' + encodeURIComponent(key);
+
+  var select = document.getElementById('modelName');
+  select.innerHTML = '<option value="">加载中...</option>';
+
+  fetch('/api/models?' + params)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) {
+        toast('获取失败: ' + data.error);
+        select.innerHTML = '<option value="">获取失败</option>';
+        return;
+      }
+      if (!data.models || data.models.length === 0) {
+        select.innerHTML = '<option value="">未找到模型</option>';
+        return;
+      }
+      var html = '';
+      var target = _pendingModelName || '';
+      for (var i = 0; i < data.models.length; i++) {
+        var m = data.models[i];
+        var sel = (m === target) ? ' selected' : '';
+        html += '<option value="' + m + '"' + sel + '>' + m + '</option>';
+      }
+      select.innerHTML = html;
+      _pendingModelName = '';
+      toast('已获取 ' + data.models.length + ' 个模型');
+    })
+    .catch(function(err) {
+      toast('获取失败: ' + err.message);
+      select.innerHTML = '<option value="">获取失败</option>';
+    });
+}
 // ===== Toast =====
 function toast(msg) {
   var e = document.getElementById('toast');

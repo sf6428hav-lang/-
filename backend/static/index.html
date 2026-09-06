@@ -98,9 +98,13 @@
     <label>API Key</label>
     <input type="password" id="apiKey" placeholder="输入你的 API Key">
     <label>模型名称</label>
-    <input type="text" id="modelName" placeholder="gemini-1.5-pro">
-    <label>提示词模板</label>
-    <input type="text" value="《麻将声》分场剧本（预设）" disabled style="background:#f0f0f0;color:#8e8e93">
+    <div style="display:flex;gap:6px">
+      <select id="modelName" style="flex:1;padding:8px 12px;border:1px solid #e5e5ea;border-radius:8px;font-size:13px;background:#fafafa;font-family:monospace;outline:none">
+        <option value="">请先获取模型列表</option>
+      </select>
+      <button type="button" class="btn-add" style="padding:8px 12px;font-size:12px" onclick="fetchModels()">获取</button>
+    </div>
+
     <div class="m-actions">
       <button class="btn-cancel" onclick="hideSettings()">取消</button>
       <button class="btn-save" onclick="saveSettings()">保存</button>
