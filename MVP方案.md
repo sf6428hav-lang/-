@@ -76,12 +76,12 @@ Gemini 3.1 Pro 原生支持视频和音频输入，能直接理解视频中的�
 - 批量导入、全集自动连续生成
 - 复杂权限和后台管理
 
-## 6. 待确认事项
+## 6. 已确认决策
 
-- 抖音解析工具最终确认（`yzfly/douyin-mcp-server` 还是 `Douyin_TikTok_Download_API`）
-- Gemini API Key（你已有，届时填入配置即可）
-- 部署方式：本地运行还是云服务器
-- 剧本是否需要同时导出 docx 和 txt
+- 抖音解析工具：先用 `yzfly/douyin-mcp-server`，不可用时随时换备选 `Douyin_TikTok_Download_API`
+- 大模型：Gemini 3.1 Pro（用户自备 API Key）
+- 部署方式：先在本机运行开发和测试，功能稳定后再考虑迁移到小服务器
+- 剧本导出：同时提供 docx 和 txt
 
 ## 7. 下一步
 
