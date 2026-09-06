@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剧本生成器</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-icon">🎬</span>
+    <div class="brand-text">
+      <h1>剧本生成器</h1>
+      <p>短剧剧本自动还原</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="showSettings()">⚙️ 设置</button>
+  </div>
+</header>
+
+<div class="main-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="card">
+        <div class="card-hdr">
+          <span>📎 添加短剧链接</span>
+          <span class="badge" id="linkCount">0 个</span>
+        </div>
+        <div class="card-body">
+          <div class="input-section">
+            <div class="input-row">
+              <input type="text" id="linkInput" placeholder="粘贴抖音或红果链接..." onkeydown="if(event.key==='Enter')addLink()">
+              <button class="btn-add" onclick="addLink()">+ 添加</button>
+            </div>
+            <div class="queue-list" id="queueList"></div>
+            <div class="batch-actions" id="batchActions" style="display:none">
+              <button class="batch-btn primary" id="genBtn" onclick="startGenerate()">🎬 开始生成</button>
+              <button class="batch-btn secondary" onclick="clearAll()">🗑 清空</button>
+            </div>
+            <div class="progress-bar" id="progressBar" style="display:none">
+              <div class="fill" id="progressFill"></div>
+            </div>
+            <div class="progress-info" id="progressInfo" style="display:none">
+              <span id="progressText">0 / 0</span>
+              <span id="progressPct">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="card">
+        <div class="card-hdr">
+          <span>📋 生成历史</span>
+          <span class="badge" id="historyCount">0</span>
+        </div>
+        <div class="card-body" style="padding:8px 12px">
+          <div class="queue-list" id="historyList" style="max-height:400px"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="workspace">
+    <div class="workspace-hdr">
+      <h2 id="resultTitle">📄 选择或生成剧本</h2>
+      <div class="actions">
+        <button class="header-btn" onclick="downloadDocx()">📄 docx</button>
+        <button class="header-btn" onclick="downloadTxt()">📃 txt</button>
+      </div>
+    </div>
+    <div class="workspace-body" id="scriptArea">
+      <div style="text-align:center;padding:60px 20px;color:#8e8e93">
+        <div style="font-size:48px;margin-bottom:16px;opacity:0.3">🎬</div>
+        <p style="font-size:15px;font-weight:500;margin-bottom:4px">添加链接并点击生成</p>
+        <p style="font-size:13px;color:#aeaeb2">系统将自动分析视频并生成《麻将声》格式的分场剧本</p>
+      </div>
+    </div>
+    <div class="workspace-ft">
+      <span>📝 字数：<strong id="charCount">0</strong> 字</span>
+      <span id="statusText"></span>
+    </div>
+  </section>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ 设置</h2>
+    <label>API Base URL</label>
+    <input type="text" id="apiUrl" placeholder="https://generativelanguage.googleapis.com">
+    <label>API Key</label>
+    <input type="password" id="apiKey" placeholder="输入你的 Gemini API Key">
+    <label>提示词模板</label>
+    <input type="text" value="《麻将声》分场剧本（预设）" disabled style="background:#f0f0f0;color:#8e8e93">
+    <div class="m-actions">
+      <button class="btn-cancel" onclick="hideSettings()">取消</button>
+      <button class="btn-save" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

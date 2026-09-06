@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>短剧剧本生成器 - Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f5f7;color:#1d1d1f;min-height:100vh;display:flex;flex-direction:column}
+/* header */
+.app-header{background:#fff;border-bottom:1px solid #e5e5ea;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{font-size:22px;line-height:1}
+.brand-text h1{font-size:17px;font-weight:700;letter-spacing:-0.3px;display:flex;align-items:center;gap:6px}
+.brand-text h1 span{font-size:10px;font-weight:500;color:#6366f1;background:#eef2ff;padding:2px 8px;border-radius:4px}
+.brand-text p{font-size:11px;color:#8e8e93;margin-top:-1px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.header-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid #e5e5ea;background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:#1d1d1f;transition:all 0.12s}
+.header-btn:hover{background:#f5f5f7;border-color:#d1d1d6}
+.header-btn.primary{background:#6366f1;color:#fff;border-color:#6366f1}
+.header-btn.primary:hover{background:#4f46e5}
+/* main layout */
+.main-layout{display:flex;flex:1;overflow:hidden;padding:20px;gap:20px;max-width:1400px;margin:0 auto;width:100%}
+/* sidebar */
+.sidebar{width:340px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:12px;border:1px solid #e5e5ea}
+
+.sidebar-section{width:100%}
+.section-hdr{padding:14px 18px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.section-body{padding:16px 18px}
+.sidebar-divider{height:1px;background:#e5e5ea;margin:0 0;width:100%}
+
+.card{overflow:hidden;width:100%}
+.card-hdr{padding:14px 18px;border-bottom:1px solid #e5e5ea;display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:13px;font-weight:600}
+.card-hdr .badge{font-size:11px;font-weight:500;color:#8e8e93;background:#f5f5f7;padding:2px 10px;border-radius:10px}
+.card-body{padding:16px 18px}
+/* input area */
+.input-section{display:flex;flex-direction:column;gap:8px}
+.input-row{display:flex;gap:6px}
+.input-row input{flex:1;padding:9px 12px;border:1px solid #e5e5ea;border-radius:8px;font-size:13px;outline:none;transition:0.12s;background:#fafafa;font-family:inherit}
+.input-row input:focus{border-color:#6366f1;background:#fff}
+.input-row .btn-add{padding:9px 16px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:0.12s;white-space:nowrap}
+.input-row .btn-add:hover{background:#4f46e5}
+/* queue list */
+.queue-list{display:flex;flex-direction:column;gap:3px;max-height:320px;overflow-y:auto}
+.queue-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;transition:0.1s;border:1px solid transparent}
+.queue-item:hover{background:#f5f5f7}
+.queue-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.queue-item .dot.wait{background:#d1d1d6}
+.queue-item .dot.done{background:#34c759}
+.queue-item .dot.running{background:#6366f1;animation:pulse 0.8s infinite}
+.queue-item .dot.fail{background:#ff3b30}
+.queue-item .info{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.queue-item .tag{font-size:10px;color:#8e8e93;flex-shrink:0}
+.queue-item .del{background:none;border:none;cursor:pointer;color:#8e8e93;font-size:14px;padding:2px;transition:0.1s;flex-shrink:0}
+.queue-item .del:hover{color:#ff3b30}
+.queue-empty{text-align:center;padding:24px;color:#8e8e93;font-size:13px}
+.queue-empty i{font-size:28px;display:block;margin-bottom:8px;opacity:0.5}
+/* batch actions */
+.batch-actions{display:flex;gap:6px;padding-top:4px;flex-wrap:wrap}
+.batch-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:0.12s}
+.batch-btn.primary{background:#6366f1;color:#fff}
+.batch-btn.primary:hover{background:#4f46e5}
+.batch-btn.primary:disabled{opacity:0.4;cursor:default}
+.batch-btn.secondary{background:#f5f5f7;color:#1d1d1f;border:1px solid #e5e5ea}
+.batch-btn.secondary:hover{background:#e8e8ed}
+.progress-bar{height:4px;background:#e5e5ea;border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-bar .fill{height:100%;background:#6366f1;border-radius:2px;transition:width 0.3s;width:0%}
+.progress-info{display:flex;justify-content:space-between;font-size:11px;color:#8e8e93;margin-top:6px}
+/* workspace */
+.workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:12px;border:1px solid #e5e5ea}
+.workspace-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e5e5ea;flex-shrink:0}
+.workspace-hdr h2{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.workspace-hdr .status-pill{font-size:10px;padding:2px 10px;border-radius:10px;background:#f5f5f7;color:#8e8e93}
+.workspace-hdr .actions{display:flex;gap:6px}
+.workspace-body{flex:1;overflow-y:auto;padding:20px;font-family:'Noto Sans SC','PingFang SC',serif;line-height:1.8;font-size:14px;white-space:pre-wrap;color:#1d1d1f}
+.workspace-ft{padding:10px 20px;border-top:1px solid #e5e5ea;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8e8e93;flex-shrink:0}
+.workspace-ft span{display:flex;align-items:center;gap:4px}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:420px;max-width:90vw;padding:24px;box-shadow:0 8px 40px rgba(0,0,0,0.12)}
+.modal h2{font-size:15px;font-weight:600;margin-bottom:16px}
+.modal label{display:block;font-size:12px;font-weight:500;color:#8e8e93;margin-bottom:4px;margin-top:12px}
+.modal label:first-of-type{margin-top:0}
+.modal input{width:100%;padding:8px 12px;border:1px solid #e5e5ea;border-radius:8px;font-size:13px;outline:none;transition:0.12s;background:#fafafa;font-family:monospace}
+.modal input:focus{border-color:#6366f1;background:#fff}
+.modal .m-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.modal .m-actions button{padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500}
+.modal .m-actions .btn-cancel{border:1px solid #e5e5ea;background:#fff;color:#1d1d1f}
+.modal .m-actions .btn-save{border:none;background:#6366f1;color:#fff}
+.modal .m-actions .btn-save:hover{background:#4f46e5}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.show{opacity:1}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
+</head>
+<body>
+<header class="app-header">
+<div class="brand">
+<span class="brand-icon">🎬</span>
+<div class="brand-text">
+<h1>剧本生成器 <span>Demo</span></h1>
+
+</div>
+</div>
+<div class="header-actions">
+<button class="header-btn" onclick="showSettings()">⚙️ 设置</button>
+</div>
+</header>
+<div class="main-layout">
+<aside class="sidebar">
+<div class="card">
+<div class="card-hdr"><span>📎 添加短剧链接</span><span class="badge" id="linkCount">0 个</span></div>
+<div class="card-body">
+<div class="input-section">
+<div class="input-row">
+<input type="text" id="linkInput" placeholder="粘贴链接，回车添加 …" onkeydown="if(event.key==='Enter')addLink()">
+<button class="btn-add" onclick="addLink()">+ 添加</button>
+</div>
+<div class="queue-list" id="queueList"></div>
+<div class="batch-actions" id="batchActions" style="display:none">
+<button class="batch-btn primary" id="genBtn" onclick="startGenerate()">🎬 开始生成</button>
+<button class="batch-btn secondary" onclick="clearAll()">🗑 清空</button>
+</div>
+<div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
+<div class="progress-info" id="progressInfo" style="display:none"><span id="progressText">0 / 0</span><span id="progressPct">0%</span></div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-hdr"><span>📋 生成历史</span><span class="badge" id="historyCount">0</span></div>
+<div class="card-body" style="padding:8px 12px">
+<div class="queue-list" id="historyList" style="max-height:200px"></div>
+</div>
+</div>
+</aside>
+<section class="workspace">
+<div class="workspace-hdr">
+<h2 id="resultTitle">📄 选择或生成剧本</h2>
+<div class="actions">
+<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="toast('下载 .docx 文件（模拟）')">📄 docx</button>
+<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="toast('下载 .txt 文件（模拟）')">📃 txt</button>
+</div>
+</div>
+<div class="workspace-body" id="scriptArea">
+<div style="text-align:center;padding:60px 20px;color:#8e8e93">
+<div style="font-size:48px;margin-bottom:16px;opacity:0.3">🎬</div>
+<p style="font-size:15px;font-weight:500;margin-bottom:4px">添加链接并点击生成</p>
+<p style="font-size:13px;color:#aeaeb2">系统将自动分析视频并生成《麻将声》格式的分场剧本</p>
+</div>
+</div>
+<div class="workspace-ft">
+<span>📝 字数：<strong id="charCount">0</strong> 字</span>
+
+</div>
+</section>
+</div>
+<div class="modal-overlay" id="settingsModal">
+<div class="modal">
+<h2>⚙️ 设置</h2>
+<label>API Base URL</label>
+<input type="text" id="apiUrl" value="https://api.gemini.example.com" placeholder="https://...">
+<label>API Key</label>
+<input type="password" id="apiKey" value="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" placeholder="输入你的 API Key">
+<label>提示词模板</label>
+<input type="text" value="《麻将声》分场剧本（预设）" disabled style="background:#f0f0f0;color:#8e8e93">
+<div class="m-actions">
+<button class="btn-cancel" onclick="hideSettings()">取消</button>
+<button class="btn-save" onclick="saveSettings()">保存</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var scripts={"深宫恨 第1集": "《深宫恨》第1集\n\n1-1 日 外 御花园\n人物：雪泠、皇帝、小德子、宫女若干\n▲【字卡：为报屠村之恨，九尾狐妖雪泠断尾入宫】\n皇帝（抬眼）：你是谁？\n雪泠（低头行礼）：臣妾雪泠，参见皇上。\n皇帝（冷笑）：又是一个送进来的。\n▲皇帝挥了挥手。\n小德子（尖声）：皇上请用茶。\n▲雪泠接过茶盏，指尖微不可察地一颤。\n雪泠（OS）：茶里有东西。看来，这宫里比我预想的还要有意思。\n\n1-2 日 内 寝宫\n人物：雪泠、贴身宫女\n▲【字卡：当天夜里】\n▲雪泠独自坐在铜镜前，取下簪子。\n贴身宫女（低声）：娘娘，您真的打算……\n雪泠（抬手打断）：有些事，知道得越少越安全。\n▲烛火摇曳，映照出雪泠半边面容。\n雪泠（VO）：这深宫里的每一步，都是踩着刀刃走。但我已经没有退路了。", "深宫恨 第2集": "《深宫恨》第2集\n\n2-1 日 内 御书房\n人物：皇帝、雪泠、小德子\n▲皇帝批阅奏折，雪泠端药入内。\n雪泠：皇上，该喝药了。\n皇帝（头也不抬）：放着吧。\n雪泠（放下药碗，犹豫片刻）：臣妾斗胆，有一句话不知当讲不当讲。\n皇帝（抬眼）：讲。\n雪泠：这药的气味……有些不对。\n▲皇帝眼神一凝，放下笔。\n皇帝：你懂药理？\n雪泠（低头）：略知一二。\n▲【特写：皇帝盯着雪泠，目光若有所思】\n皇帝：你倒是跟别人不一样。", "满院亲戚都是上古大妖 第5集": "《满院亲戚都是上古大妖》第5集\n\n5-1 日 内 客厅\n人物：苏小满、三叔公、白姨\n▲三叔公坐在沙发上喝茶，白姨在厨房忙碌。\n苏小满（从楼梯上走下来）：三叔公，您这茶……怎么是红的？\n三叔公（淡定）：哦，麒麟血，补气。\n▲苏小满愣在原地。\n白姨（从厨房探出头）：小满，过来帮姨看看，这龙肝是不是炒老了？\n苏小满：……这就是我们家说的「普通乡下亲戚」？", "穿越后我贷款搬空商城 序章": "《穿越后我贷款搬空商城》序章\n\n0-1 日 内 现代办公室\n人物：林晓、主管\n▲林晓盯着电脑屏幕，双手飞快敲击键盘。\n主管（拍桌）：林晓！你这个月KPI又垫底！\n林晓（头也不回）：知道了知道了。\n▲【特写：手机屏幕亮起——房贷还款提醒】\n林晓（OS）：人生已经够糟糕了，还能更糟吗？\n▲【闪屏】\n▲【字卡：三天后】\n林晓站在一片古风街道上，面前是巍峨的皇宫。\n林晓：……还真能更糟。"};
+var history = [
+  {title:"深宫恨 第1集",date:"14:32",active:false,ep:"深宫恨 第1集"},
+  {title:"深宫恨 第2集",date:"14:28",active:false,ep:"深宫恨 第2集"},
+  {title:"满院亲戚都是上古大妖 第5集",date:"13:10",active:false,ep:"满院亲戚都是上古大妖 第5集"}
+];
+var links = [];
+var isGenerating = false;
+
+function renderHistory() {
+  var l = document.getElementById('historyList');
+  if (!l) return;
+  l.innerHTML = '';
+  history.forEach(function(item, idx) {
+    var d = document.createElement('div');
+    d.className = 'queue-item';
+    d.style.cursor = 'pointer';
+    d.innerHTML = '<span class="dot done"></span><span class="info">' + item.title + '</span><span class="tag">' + item.date + '</span>';
+    d.onclick = function() {
+      showScript(item.ep, item.title);
+    };
+    l.appendChild(d);
+  });
+  document.getElementById('historyCount').textContent = history.length;
+}
+renderHistory();
+
+function renderLinks() {
+  var list = document.getElementById('queueList');
+  if (!list) return;
+  if (links.length === 0) {
+    list.innerHTML = '<div class="queue-empty"><i>🔗</i><p>暂无链接，在上方粘贴后添加</p></div>';
+    document.getElementById('batchActions').style.display = 'none';
+    document.getElementById('progressBar').style.display = 'none';
+    document.getElementById('progressInfo').style.display = 'none';
+    return;
+  }
+  document.getElementById('batchActions').style.display = 'flex';
+  var html = '';
+  for (var i = 0; i < links.length; i++) {
+    var l = links[i];
+    var dotClass = l.status;
+    var label = {wait:'等待',done:'已完成',running:'生成中',fail:'失败'}[l.status]||'等待';
+    var urlDisplay = l.url.length > 45 ? l.url.slice(0,45)+'…' : l.url;
+    var platform = l.url.includes('douyin')||l.url.includes('v.douyin') ? '抖音' : l.url.includes('novelquickapp') ? '红果' : '链接';
+    html += '<div class="queue-item"><span class="dot '+dotClass+'"></span><span class="info"><small style="color:#8e8e93">['+platform+']</small> '+urlDisplay+'</span><span class="tag">'+label+'</span><button class="del" onclick="removeLink('+i+')" '+(isGenerating?'disabled':'')+'>✕</button></div>';
+  }
+  list.innerHTML = html;
+  document.getElementById('linkCount').textContent = links.length + ' 个';
+  document.getElementById('genBtn').textContent = '🎬 开始生成（' + links.length + '）';
+}
+renderLinks();
+
+function addLink() {
+  var input = document.getElementById('linkInput');
+  var val = input.value.trim();
+  if (!val) return;
+  links.push({url:val,status:'wait'});
+  input.value = '';
+  input.focus();
+  renderLinks();
+}
+function removeLink(idx) {
+  links.splice(idx,1);
+  renderLinks();
+}
+function clearAll() {
+  if (isGenerating) return;
+  links = [];
+  renderLinks();
+}
+
+function startGenerate() {
+  if (isGenerating || links.length === 0) return;
+  var pending = links.filter(function(l){return l.status==='wait'});
+  if (pending.length === 0) { toast('没有待生成的链接'); return; }
+  isGenerating = true;
+  var btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 生成中 …';
+  document.getElementById('progressBar').style.display = 'block';
+  document.getElementById('progressInfo').style.display = 'flex';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressText').textContent = '0 / ' + links.length;
+  document.getElementById('progressPct').textContent = '0%';
+  var idx = 0;
+  var done = 0;
+  function next() {
+    while (idx < links.length && links[idx].status !== 'wait') idx++;
+    if (idx >= links.length) {
+      isGenerating = false;
+      btn.disabled = false;
+      btn.textContent = '🎬 开始生成';
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressText').textContent = links.length + ' / ' + links.length;
+      document.getElementById('progressPct').textContent = '100%';
+      renderLinks();
+      showScript('batch', '生成完成');
+      var batch = {title:'批量生成（'+links.length+'个）',date:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),active:false,ep:'batch'};
+      history.unshift(batch);
+      renderHistory();
+      toast('✅ 全部生成完成');
+      return;
+    }
+    links[idx].status = 'running';
+    renderLinks();
+    var delay = 600 + Math.random() * 400;
+    setTimeout(function() {
+      links[idx].status = 'done';
+      done++;
+      renderLinks();
+      document.getElementById('progressFill').style.width = (done / links.length * 100) + '%';
+      document.getElementById('progressText').textContent = done + ' / ' + links.length;
+      document.getElementById('progressPct').textContent = Math.round(done / links.length * 100) + '%';
+      idx++;
+      next();
+    }, delay);
+  }
+  next();
+}
+
+function showScript(ep, title) {
+  document.getElementById('resultTitle').innerHTML = '📄 ' + title;
+  var area = document.getElementById('scriptArea');
+  if (ep === 'batch') {
+    area.textContent = '共 ' + links.length + ' 个剧本已生成完毕。\n\n点击左侧历史记录查看具体内容。';
+  } else if (scripts[ep]) {
+    area.textContent = scripts[ep];
+    var cnt = scripts[ep].length;
+    document.getElementById('charCount').textContent = cnt;
+  } else {
+    area.textContent = '(暂无内容)';
+  }
+}
+
+function showSettings() { document.getElementById('settingsModal').classList.add('show'); }
+function hideSettings() { document.getElementById('settingsModal').classList.remove('show'); }
+function saveSettings() {
+  var url = document.getElementById('apiUrl').value.trim();
+  var key = document.getElementById('apiKey').value.trim();
+  if (!url || !key) { toast('请填写 API URL 和 Key'); return; }
+  hideSettings();
+  toast('✅ 设置已保存（模拟）');
+}
+function toast(msg) {
+  var e = document.getElementById('toast');
+  e.textContent = msg;
+  e.classList.add('show');
+  setTimeout(function(){e.classList.remove('show')},2000);
+}
+</script>
+</body>
+</html>
