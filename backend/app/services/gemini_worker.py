@@ -1,36 +1,56 @@
 import os
+import base64
 from pathlib import Path
-from google import genai
+from openai import OpenAI
 from ..config import settings
 from ..prompt_template import MAHJONG_PROMPT
 
-async def generate_script(video_path: Path, custom_prompt: str = None) -> str:
-    """Send video to Gemini 3.1 Pro and get formatted script."""
-    
+
+def generate_script(video_path: Path, custom_prompt: str = None) -> str:
+    """Send video to Gemini via OpenAI-compatible API and get formatted script."""
+
     if not settings.gemini_api_key:
         raise ValueError("Gemini API Key not configured. Please set GEMINI_API_KEY in .env")
 
-    client = genai.Client(
+    client = OpenAI(
         api_key=settings.gemini_api_key,
-        http_options={"base_url": settings.gemini_api_base_url} if settings.gemini_api_base_url else None,
+        base_url=settings.gemini_api_base_url,
     )
-    
+
     prompt = custom_prompt or MAHJONG_PROMPT
-    
-    file_size = video_path.stat().st_size
-    
-    # Use File API for uploading
-    uploaded_file = client.files.upload(file=str(video_path))
-    
-    response = client.models.generate_content(
-        model="gemini-2.5-pro",
-        contents=[uploaded_file, prompt]
+
+    # Read video file and encode as base64
+    video_data = video_path.read_bytes()
+    video_b64 = base64.b64encode(video_data).decode('utf-8')
+
+    # Determine MIME type
+    suffix = video_path.suffix.lower()
+    mime_map = {
+        '.mp4': 'video/mp4',
+        '.mov': 'video/quicktime',
+        '.avi': 'video/x-msvideo',
+        '.webm': 'video/webm',
+        '.mkv': 'video/x-matroska',
+    }
+    mime_type = mime_map.get(suffix, 'video/mp4')
+
+    response = client.chat.completions.create(
+        model=settings.gemini_model or "gemini-1.5-pro",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "video",
+                        "video": f"data:{mime_type};base64,{video_b64}"
+                    },
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
     )
-    
-    # Clean up uploaded file
-    try:
-        client.files.delete(name=uploaded_file.name)
-    except Exception:
-        pass
-    
-    return response.text
+
+    return response.choices[0].message.content

@@ -17,6 +17,7 @@ async def get_settings():
     return {
         "api_base_url": settings.gemini_api_base_url,
         "api_key": masked_key,
+        "model_name": settings.gemini_model,
         "prompt_template": "mahjong",
     }
 
@@ -42,10 +43,16 @@ async def update_settings(data: SettingsModel):
                 lines[i] = f"GEMINI_API_KEY={data.api_key}"
             keys_found["key"] = True
     
+    for i, line in enumerate(lines):
+        if line.startswith("GEMINI_MODEL="):
+            lines[i] = f"GEMINI_MODEL={data.model_name}"
+            keys_found["model"] = True
     if "base" not in keys_found:
         lines.append(f"GEMINI_API_BASE_URL={data.api_base_url}")
     if "key" not in keys_found and "****" not in data.api_key:
         lines.append(f"GEMINI_API_KEY={data.api_key}")
+    if "model" not in keys_found:
+        lines.append(f"GEMINI_MODEL={data.model_name}")
     
     env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     
@@ -53,5 +60,6 @@ async def update_settings(data: SettingsModel):
     settings.gemini_api_base_url = data.api_base_url
     if "****" not in data.api_key:
         settings.gemini_api_key = data.api_key
+    settings.gemini_model = data.model_name
     
     return {"message": "Settings saved"}

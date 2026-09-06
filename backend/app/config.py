@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     gemini_api_base_url: str = "https://generativelanguage.googleapis.com"
     gemini_api_key: str = ""
+    gemini_model: str = "gemini-1.5-pro"
     port: int = 8000
     
     # Paths

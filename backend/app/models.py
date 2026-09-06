@@ -30,6 +30,7 @@ class HistoryResponse(BaseModel):
 class SettingsModel(BaseModel):
     api_base_url: str
     api_key: str
+    model_name: str = "gemini-1.5-pro"
     prompt_template: str = "default"
 
 class ProgressEvent(BaseModel):

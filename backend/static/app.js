@@ -340,7 +340,8 @@ function saveSettings() {
     return;
   }
 
-  var payload = { api_base_url: url, api_key: key || '****', prompt_template: 'default' };
+  var model = document.getElementById('modelName').value.trim() || 'gemini-1.5-pro';
+  var payload = { api_base_url: url, api_key: key || '****', model_name: model, prompt_template: 'default' };
 
   fetch('/api/settings', {
     method: 'PUT',
