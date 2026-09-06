@@ -30,9 +30,9 @@ async def parse_douyin(url: str) -> ParseResult:
 
     # Look for video URLs in page content
     patterns = [
-        r"playAddr['":\s]*['"](https?://[^'"]+)['"]',
-        r"play_url['":\s]*['"](https?://[^'"]+)['"]',
-        r"src['":\s]*['"]?(https?://[^'"\s]+\.mp4[^'"\s]*)",
+        r'playAddr[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
+        r'play_url[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
+        r'src[\'":\s]*[\'"]?(https?://[^\'"\s]+\.mp4[^\'"\s]*)',
     ]
     for pattern in patterns:
         match = re.search(pattern, html)
