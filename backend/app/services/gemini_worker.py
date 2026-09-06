@@ -10,11 +10,7 @@ FFMPEG = "C:\\Program Files\\EVCapture\\ffmpeg.exe"
 
 
 def generate_script(video_path: Path, custom_prompt: str = None) -> str:
-    """Extract audio (MP3) + frames (1fps JPEG) from video, send to Gemini.
-    
-    This avoids the 413 request body limit by using small audio + image files
-    instead of a large video file.
-    """
+    """Extract audio (MP3) + frames (2fps, q:v 20) from video, send to Gemini."""
     if not settings.gemini_api_key:
         raise ValueError("Gemini API Key not configured. Please set GEMINI_API_KEY in .env")
 
@@ -40,12 +36,12 @@ def generate_script(video_path: Path, custom_prompt: str = None) -> str:
         audio_b64 = base64.b64encode(audio_data).decode('utf-8')
         print(f"Audio: {len(audio_data) / 1024:.0f} KB")
         
-        # 2. Extract frames at 1fps, 480p, JPEG quality 10
+        # 2. Extract frames at 2fps, 480p, JPEG quality 20
         frames_dir = tmpdir / "frames"
         frames_dir.mkdir()
         subprocess.run([
             FFMPEG, "-y", "-i", str(video_path),
-            "-vf", "fps=1,scale=480:-2", "-q:v", "10",
+            "-vf", "fps=2,scale=480:-2", "-q:v", "20",
             str(frames_dir / "frame_%04d.jpg")
         ], capture_output=True, check=True)
         
@@ -54,7 +50,7 @@ def generate_script(video_path: Path, custom_prompt: str = None) -> str:
         total_frame_size = sum(f.stat().st_size for f in frames)
         print(f"Frames: {total_frames} images, {total_frame_size / 1024:.0f} KB total")
         
-        # 3. Build content array: audio + all frames + text prompt
+        # 3. Build content: audio + all frames + text prompt
         content_parts = [
             {
                 "type": "input_audio",
@@ -65,7 +61,7 @@ def generate_script(video_path: Path, custom_prompt: str = None) -> str:
             }
         ]
         
-        for i, frame_path in enumerate(frames):
+        for frame_path in frames:
             frame_data = frame_path.read_bytes()
             frame_b64 = base64.b64encode(frame_data).decode('utf-8')
             content_parts.append({
