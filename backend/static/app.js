@@ -324,7 +324,11 @@ function loadSettings() {
     .then(function(data) {
       document.getElementById('apiUrl').value = data.api_base_url || '';
       document.getElementById('apiKey').value = '';
-      document.getElementById('apiKey').placeholder = data.api_key || '\u8f93\u5165\u4f60\u7684 Gemini API Key';
+      document.getElementById('apiKey').placeholder = data.api_key || '\u8f93\u5165\u4f60\u7684 API Key';
+      if (data.model_name) {
+        _pendingModelName = data.model_name;
+        if (data.api_base_url && data.api_key) fetchModels();
+      }
     })
     .catch(function() {
       // ignore
