@@ -30,11 +30,16 @@ async def generate_scripts(request: GenerateRequest):
                 yield _sse({"type": "progress", "index": idx, "status": "parsing", "message": f"Parsing link {idx+1}..."})
                 parsed = await parse_link(link)
 
-                # Download
-                yield _sse({"type": "progress", "index": idx, "status": "downloading", "message": "Downloading video..."})
-                ext = ".mp4"
-                filename = f"{record_id}{ext}"
-                video_path = await download_video(parsed.video_url, filename)
+                # Download (or use already downloaded file)
+                if parsed.local_path:
+                    # yt-dlp already downloaded the file
+                    yield _sse({"type": "progress", "index": idx, "status": "downloading", "message": "Video already downloaded..."})
+                    video_path = Path(parsed.local_path)
+                else:
+                    yield _sse({"type": "progress", "index": idx, "status": "downloading", "message": "Downloading video..."})
+                    ext = ".mp4"
+                    filename = f"{record_id}{ext}"
+                    video_path = await download_video(parsed.video_url, filename)
 
                 # Generate
                 yield _sse({"type": "progress", "index": idx, "status": "generating", "message": "Generating script with Gemini..."})

@@ -2,11 +2,12 @@ import re
 from typing import Optional
 
 class ParseResult:
-    def __init__(self, platform: str, video_url: str, title: str = "", metadata: dict = None):
+    def __init__(self, platform: str, video_url: str, title: str = "", metadata: dict = None, local_path: str = None):
         self.platform = platform
         self.video_url = video_url
         self.title = title
         self.metadata = metadata or {}
+        self.local_path = local_path  # yt-dlp already downloaded the file
 
 def detect_platform(url: str) -> str:
     if re.search(r"(douyin\.com|v\.douyin|tiktok\.com)", url, re.I):

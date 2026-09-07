@@ -1,60 +1,52 @@
-import httpx
-import re
-import json
+import asyncio
+from pathlib import Path
+from ..config import settings
 from .parser import ParseResult
 
 async def parse_hongguo(url: str) -> ParseResult:
-    """Parse Hongguo (红果短剧) video URL"""
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
-                      "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-    }
+    """Use yt-dlp to parse and download Hongguo video."""
+    dest_dir = settings.downloads_dir
 
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-        try:
-            resp = await client.get(url, headers=headers)
-            html = resp.text
-            final_url = str(resp.url)
-        except Exception as e:
-            raise ValueError(f"Failed to fetch Hongguo page: {e}")
+    proc = await asyncio.create_subprocess_exec(
+        'yt-dlp',
+        '-o', str(dest_dir / '%(id)s.%(ext)s'),
+        '-f', 'best[ext=mp4]/best',
+        '--quiet', '--no-warnings',
+        '--socket-timeout', '30',
+        '--print', 'after_move:filepath',
+        url,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        cwd=str(dest_dir)
+    )
+    stdout, stderr = await proc.communicate()
 
-    video_url = None
+    if proc.returncode != 0:
+        raise ValueError(f"yt-dlp failed for Hongguo: {stderr.decode('utf-8', errors='replace')[:500]}")
+
+    filepath = stdout.decode('utf-8').strip()
+    if not filepath or not Path(filepath).exists():
+        raise ValueError("yt-dlp did not produce a valid file path")
+
+    # Get video info
+    info_proc = await asyncio.create_subprocess_exec(
+        'yt-dlp', '--dump-json', '--no-download', url,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    info_stdout, _ = await info_proc.communicate()
     title = ""
-
-    # Look for video URLs in page content
-    patterns = [
-        r'playAddr[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
-        r'play_url[\'":\s]*[\'"](https?://[^\'"]+)[\'"]',
-        r'src[\'":\s]*[\'"]?(https?://[^\'"\s]+\.mp4[^\'"\s]*)',
-        r'"url"[\'":\s]*[\'"](https?://[^\'"]+\.mp4[^\'"]*)[\'"]',
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, html)
-        if match:
-            video_url = match.group(1)
-            break
-
-    # Try to extract title from page
-    m = re.search(r"<title>([^<]+)</title>", html)
-    if m:
-        title = m.group(1)
-
-    # Try to extract from JSON-LD or meta tags
-    if not title:
-        m = re.search(r'<meta[^>]*property="og:title"[^>]*content="([^"]+)"', html)
-        if m:
-            title = m.group(1)
-
-    if not video_url:
-        raise ValueError(
-            "Could not extract Hongguo video URL. "
-            "The page structure may have changed."
-        )
+    try:
+        import json
+        info = json.loads(info_stdout.decode('utf-8'))
+        title = info.get('title', '') or info.get('description', '')[:100]
+    except:
+        pass
 
     return ParseResult(
         platform="hongguo",
-        video_url=video_url,
-        title=title or "Unknown Drama",
-        metadata={"source_url": url}
+        video_url="",
+        title=title or "Hongguo Video",
+        metadata={"source_url": url},
+        local_path=filepath
     )
