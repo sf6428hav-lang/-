@@ -66,11 +66,11 @@ function showSettings(){document.getElementById('settingsModal').classList.add('
 function hideSettings(){document.getElementById('settingsModal').classList.remove('show');}
 
 function loadSettings(){
-  var saved=localStorage.getItem('scriptGenSettings');
-  if(saved){try{var s=JSON.parse(saved);document.getElementById('apiUrl').value=s.url||'';document.getElementById('apiKey').value=s.key||'';if(s.model){_pendingModelName=s.model;}}catch(e){}}
-  fetch('/api/settings').then(function(r){return r.json();}).then(function(data){
-    if(!localStorage.getItem('scriptGenSettings')){document.getElementById('apiUrl').value=data.api_base_url||'';document.getElementById('apiKey').value='';document.getElementById('apiKey').placeholder=data.api_key||'输入你的 API Key';}
-    if(data.model_name){_pendingModelName=data.model_name;if(data.api_base_url&&data.api_key)fetchModels();}
+  var s=localStorage.getItem("scriptGenSettings");
+  if(s){try{var d=JSON.parse(s);document.getElementById("apiUrl").value=d.url||"";document.getElementById("apiKey").value=d.key||"";if(d.model)_pendingModelName=d.model;if(d.url&&d.key)setTimeout(fetchModels,500);}catch(e){}return;}
+  fetch("/api/settings").then(function(r){return r.json();}).then(function(d){
+    document.getElementById("apiUrl").value=d.api_base_url||"";
+    if(d.model_name)_pendingModelName=d.model_name;
   }).catch(function(){});
 }
 
@@ -99,3 +99,8 @@ function fetchModels(){
 function toast(msg){var e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2500);}
 
 renderLinks();renderHistory();loadSettings();
+
+
+
+
+
