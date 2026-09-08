@@ -5,6 +5,17 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 
 
+def _set_run_font(run, size=11):
+    """显式设置 run 字体为微软雅黑（含中文字体），不加粗不斜体。"""
+    run.font.name = "Microsoft YaHei"
+    run.font.size = Pt(size)
+    run.font.bold = False
+    run.font.italic = False
+    rPr = run._element.get_or_add_rPr()
+    rFonts = rPr.get_or_add_rFonts()
+    rFonts.set(qn("w:eastAsia"), "微软雅黑")
+
+
 def generate_docx(content: str, title: str, output_path: Path) -> Path:
     """生成排版后的 .docx 剧本文件。
     
@@ -37,9 +48,7 @@ def generate_docx(content: str, title: str, output_path: Path) -> Path:
     title_p = doc.add_paragraph()
     title_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title_run = title_p.add_run(title)
-    title_run.font.size = Pt(16)
-    title_run.bold = False
-    title_run.italic = False
+    _set_run_font(title_run, size=16)
 
     lines = content.split("\n")
 
@@ -52,9 +61,7 @@ def generate_docx(content: str, title: str, output_path: Path) -> Path:
 
         p = doc.add_paragraph()
         run = p.add_run(raw)
-        run.bold = False
-        run.italic = False
-        run.font.size = Pt(11)
+        _set_run_font(run)
 
         # 场次行（形如 “1-1 日/内 客厅”）上方加一点间距，作为视觉分节
         if len(raw) > 2 and raw[0].isdigit() and "-" in raw[:5]:
