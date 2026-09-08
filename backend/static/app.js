@@ -58,6 +58,40 @@ function startGenerate(){
 function finishGen(doneCount,failCount){isGenerating=false;var btn=document.getElementById('genBtn');btn.disabled=false;btn.textContent='🎬 开始生成';document.getElementById('progressFill').style.width='100%';if(doneCount>0)toast('✅ 生成完成'+(failCount>0?'，'+failCount+' 个失败':''));else if(failCount>0)toast('❌ 生成失败');loadHistory();renderLinks();}
 function loadHistory(){fetch('/api/history?page=1&page_size=50').then(function(r){return r.json();}).then(function(data){history=data.items||[];renderHistory();}).catch(function(){history=[];renderHistory();});}
 function loadScript(id,title){currentScriptId=id;document.getElementById('resultTitle').innerHTML='📄 '+escapeHtml(title);document.getElementById('scriptArea').textContent='加载中…';fetch('/api/scripts/'+id).then(function(r){if(!r.ok)throw new Error('Not found');return r.json();}).then(function(data){document.getElementById('scriptArea').textContent=data.output;document.getElementById('charCount').textContent=data.output.length;renderHistory();}).catch(function(){document.getElementById('scriptArea').textContent='(暂无内容)';document.getElementById('charCount').textContent='0';});}
+
+function reformatScript(){
+  if(!currentScriptId){toast('请先选择一个剧本');return;}
+  var area = document.getElementById('scriptArea');
+  var text = area.textContent || '';
+  if(!text || text === '加载中…'){toast('暂无可排版内容');return;}
+  var formatted = formatScriptText(text);
+  area.textContent = formatted;
+  document.getElementById('charCount').textContent = formatted.length;
+  toast('✅ 排版完成');
+}
+
+function formatScriptText(text){
+  var lines = text.split('
+');
+  var out = [];
+  var prevBlank = false;
+  for(var i=0;i<lines.length;i++){
+    var line = lines[i].trim();
+    if(!line){
+      if(!prevBlank && out.length > 0 && out[out.length-1] !== ''){ out.push(''); }
+      prevBlank = true;
+      continue;
+    }
+    prevBlank = false;
+    out.push(line);
+  }
+  // 去除首尾多余空行
+  while(out.length && out[0] === '') out.shift();
+  while(out.length && out[out.length-1] === '') out.pop();
+  return out.join('
+');
+}
+
 function downloadDocx(){if(!currentScriptId){toast('请先选择一个剧本');return;}window.open('/api/scripts/'+currentScriptId+'/download?format=docx','_blank');}
 function downloadTxt(){if(!currentScriptId){toast('请先选择一个剧本');return;}window.open('/api/scripts/'+currentScriptId+'/download?format=txt','_blank');}
 
