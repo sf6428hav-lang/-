@@ -30,9 +30,8 @@ async def generate_scripts(request: GenerateRequest):
                 yield _sse({"type": "progress", "index": idx, "status": "parsing", "message": f"Parsing link {idx+1}..."})
                 parsed = await parse_link(link)
 
-                # Download (or use already downloaded file)
+                # Download
                 if parsed.local_path:
-                    # yt-dlp already downloaded the file
                     yield _sse({"type": "progress", "index": idx, "status": "downloading", "message": "Video already downloaded..."})
                     video_path = Path(parsed.local_path)
                 else:
@@ -59,7 +58,7 @@ async def generate_scripts(request: GenerateRequest):
                     )
                     await db.commit()
 
-                records.append({"id": record_id, "title": title, "status": "done"})
+                records.append({"id": record_id, "title": title, "status": "done", "output": script_text})
                 yield _sse({"type": "progress", "index": idx, "status": "done", "message": "Complete"})
 
                 # Cleanup video

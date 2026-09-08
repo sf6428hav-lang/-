@@ -22,10 +22,6 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 .header-btn.primary:hover{background:#4f46e5}
 .main-layout{display:flex;flex:1;overflow:hidden;padding:20px;gap:20px;max-width:1400px;margin:0 auto;width:100%}
 .sidebar{width:340px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:12px;border:1px solid #e5e5ea}
-.sidebar-section{width:100%}
-.section-hdr{padding:14px 18px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
-.section-body{padding:16px 18px}
-.sidebar-divider{height:1px;background:#e5e5ea;margin:0 0;width:100%}
 .card{overflow:hidden;width:100%}
 .card-hdr{padding:14px 18px;border-bottom:1px solid #e5e5ea;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600}
 .card-hdr .badge{font-size:11px;font-weight:500;color:#8e8e93;background:#f5f5f7;padding:2px 10px;border-radius:10px}
@@ -37,7 +33,7 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 .input-row .btn-add{padding:9px 16px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:0.12s;white-space:nowrap}
 .input-row .btn-add:hover{background:#4f46e5}
 .queue-list{display:flex;flex-direction:column;gap:3px;max-height:320px;overflow-y:auto}
-.queue-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;transition:0.1s;border:1px solid transparent}
+.queue-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;transition:0.1s;border:1px solid transparent;cursor:pointer}
 .queue-item:hover{background:#f5f5f7}
 .queue-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .queue-item .dot.wait{background:#d1d1d6}
@@ -63,22 +59,25 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 .workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;border-radius:12px;border:1px solid #e5e5ea}
 .workspace-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e5e5ea;flex-shrink:0}
 .workspace-hdr h2{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
-.workspace-hdr .status-pill{font-size:10px;padding:2px 10px;border-radius:10px;background:#f5f5f7;color:#8e8e93}
 .workspace-hdr .actions{display:flex;gap:6px}
 .workspace-body{flex:1;overflow-y:auto;padding:20px;font-family:'Noto Sans SC','PingFang SC',serif;line-height:1.8;font-size:14px;white-space:pre-wrap;color:#1d1d1f}
 .workspace-ft{padding:10px 20px;border-top:1px solid #e5e5ea;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8e8e93;flex-shrink:0}
-.workspace-ft span{display:flex;align-items:center;gap:4px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:100;display:none;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
-.modal{background:#fff;border-radius:14px;width:420px;max-width:90vw;padding:24px;box-shadow:0 8px 40px rgba(0,0,0,0.12)}
-.modal h2{font-size:15px;font-weight:600;margin-bottom:16px}
-.modal label{display:block;font-size:12px;font-weight:500;color:#8e8e93;margin-bottom:4px;margin-top:12px}
+.modal{background:#fff;border-radius:14px;width:400px;max-width:90vw;padding:24px;box-shadow:0 8px 40px rgba(0,0,0,0.12)}
+.modal h2{font-size:15px;font-weight:600;margin-bottom:20px}
+.modal label{display:block;font-size:12px;font-weight:600;color:#6b7280;margin-bottom:4px;margin-top:14px}
 .modal label:first-of-type{margin-top:0}
-.modal input,.modal select{width:100%;padding:8px 12px;border:1px solid #e5e5ea;border-radius:8px;font-size:13px;outline:none;transition:0.12s;background:#fafafa;font-family:monospace}
-.modal input:focus,.modal select:focus{border-color:#6366f1;background:#fff}
-.modal .m-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.modal .m-actions button{padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500}
-.modal .m-actions .btn-cancel{border:1px solid #e5e5ea;background:#fff;color:#1d1d1f}
+.modal input,.modal select{width:100%;padding:10px 12px;border:1px solid #e5e5ea;border-radius:10px;font-size:13px;outline:none;transition:0.12s;background:#f9fafb;font-family:monospace}
+.modal input:focus,.modal select:focus{border-color:#6366f1;background:#fff;box-shadow:0 0 0 3px rgba(99,102,241,0.1)}
+.modal .model-row{display:flex;gap:6px}
+.modal .model-row select{flex:1}
+.modal .model-row button{padding:10px 14px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:0.12s}
+.modal .model-row button:hover{background:#4f46e5}
+.modal .m-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+.modal .m-actions button{padding:9px 20px;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600}
+.modal .m-actions .btn-cancel{border:1px solid #e5e5ea;background:#fff;color:#6b7280}
+.modal .m-actions .btn-cancel:hover{background:#f5f5f7}
 .modal .m-actions .btn-save{border:none;background:#6366f1;color:#fff}
 .modal .m-actions .btn-save:hover{background:#4f46e5}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:200;white-space:nowrap}
@@ -89,20 +88,20 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 <body>
 <header class="app-header">
 <div class="brand">
-<span class="brand-icon">&#x1F3AC;</span>
+<span class="brand-icon">🎬</span>
 <div class="brand-text">
-<h1>剧本生成器 <span>Beta</span></h1>
+<h1>剧本生成器</h1>
 <p>短剧剧本自动还原</p>
 </div>
 </div>
 <div class="header-actions">
-<button class="header-btn" onclick="showSettings()">&#x2699;&#xFE0F; 设置</button>
+<button class="header-btn" onclick="showSettings()">⚙️ 设置</button>
 </div>
 </header>
 <div class="main-layout">
 <aside class="sidebar">
 <div class="card">
-<div class="card-hdr"><span>&#x1F4CE; 添加短剧链接</span><span class="badge" id="linkCount">0 个</span></div>
+<div class="card-hdr"><span>📎 添加短剧链接</span><span class="badge" id="linkCount">0 个</span></div>
 <div class="card-body">
 <div class="input-section">
 <div class="input-row">
@@ -111,8 +110,8 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 </div>
 <div class="queue-list" id="queueList"></div>
 <div class="batch-actions" id="batchActions" style="display:none">
-<button class="batch-btn primary" id="genBtn" onclick="startGenerate()">&#x1F3AC; 开始生成</button>
-<button class="batch-btn secondary" onclick="clearAll()">&#x1F5D1; 清空</button>
+<button class="batch-btn primary" id="genBtn" onclick="startGenerate()">🎬 开始生成</button>
+<button class="batch-btn secondary" onclick="clearAll()">🗑 清空</button>
 </div>
 <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
 <div class="progress-info" id="progressInfo" style="display:none"><span id="progressText">0 / 0</span><span id="progressPct">0%</span></div>
@@ -120,7 +119,7 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 </div>
 </div>
 <div class="card">
-<div class="card-hdr"><span>&#x1F4CB; 生成历史</span><span class="badge" id="historyCount">0</span></div>
+<div class="card-hdr"><span>📋 生成历史</span><span class="badge" id="historyCount">0</span></div>
 <div class="card-body" style="padding:8px 12px">
 <div class="queue-list" id="historyList" style="max-height:200px"></div>
 </div>
@@ -128,40 +127,36 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 </aside>
 <section class="workspace">
 <div class="workspace-hdr">
-<h2 id="resultTitle">&#x1F4C4; 选择或生成剧本</h2>
+<h2 id="resultTitle">📄 选择或生成剧本</h2>
 <div class="actions">
-<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="downloadDocx()">&#x1F4C4; docx</button>
-<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="downloadTxt()">&#x1F4C3; txt</button>
+<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="downloadDocx()">📄 docx</button>
+<button class="header-btn" style="padding:5px 10px;font-size:12px" onclick="downloadTxt()">📃 txt</button>
 </div>
 </div>
 <div class="workspace-body" id="scriptArea">
 <div style="text-align:center;padding:60px 20px;color:#8e8e93">
-<div style="font-size:48px;margin-bottom:16px;opacity:0.3">&#x1F3AC;</div>
+<div style="font-size:48px;margin-bottom:16px;opacity:0.3">🎬</div>
 <p style="font-size:15px;font-weight:500;margin-bottom:4px">添加链接并点击生成</p>
 <p style="font-size:13px;color:#aeaeb2">系统将自动分析视频并生成《麻将声》格式的分场剧本</p>
 </div>
 </div>
 <div class="workspace-ft">
-<span>&#x1F4DD; 字数：<strong id="charCount">0</strong> 字</span>
+<span>📝 字数：<strong id="charCount">0</strong> 字</span>
 </div>
 </section>
 </div>
 <div class="modal-overlay" id="settingsModal">
 <div class="modal">
-<h2>&#x2699;&#xFE0F; 设置</h2>
-<label>API Base URL</label>
-<input type="text" id="apiUrl" placeholder="https://...">
+<h2>⚙️ 设置</h2>
+<label>API 地址</label>
+<input type="text" id="apiUrl" placeholder="https://your-api.com/v1">
 <label>API Key</label>
-<input type="password" id="apiKey" placeholder="输入你的 API Key">
-<label>模型名称</label>
-<div style="display:flex;gap:6px">
-<select id="modelName" style="flex:1">
-<option value="">请先获取模型列表</option>
-</select>
-<button type="button" class="btn-add" style="padding:8px 12px;font-size:12px" onclick="fetchModels()">获取</button>
+<input type="password" id="apiKey" placeholder="sk-xxxxxxxx">
+<label>模型</label>
+<div class="model-row">
+<select id="modelName"><option value="">获取模型列表</option></select>
+<button type="button" onclick="fetchModels()">获取</button>
 </div>
-<label>提示词模板</label>
-<input type="text" value="《麻将声》分场剧本（预设）" disabled style="background:#f0f0f0;color:#8e8e93">
 <div class="m-actions">
 <button class="btn-cancel" onclick="hideSettings()">取消</button>
 <button class="btn-save" onclick="saveSettings()">保存</button>
@@ -169,203 +164,6 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:#f5f
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script>
-var links=[];
-var isGenerating=false;
-var currentScriptId=null;
-var history=[];
-var _pendingModelName='';
-
-function detectPlatform(u){if(/douyin\.com|v\.douyin|tiktok\.com/i.test(u))return'抖音';if(/hongguo|novelquickapp|changdunovel/i.test(u))return'红果';return'链接';}
-
-function renderLinks(){
-  var list=document.getElementById('queueList');
-  if(!list)return;
-  if(links.length===0){
-    list.innerHTML='<div class="queue-empty"><i>\u{1F517}</i><p>暂无链接，在上方粘贴后添加</p></div>';
-    document.getElementById('batchActions').style.display='none';
-    document.getElementById('progressBar').style.display='none';
-    document.getElementById('progressInfo').style.display='none';
-    return;
-  }
-  document.getElementById('batchActions').style.display='flex';
-  var html='';
-  for(var i=0;i<links.length;i++){
-    var l=links[i];
-    var dotClass=l.status||'wait';
-    var labelMap={wait:'等待',done:'已完成',running:'生成中',fail:'失败',parsing:'解析中',downloading:'下载中',generating:'生成中'};
-    var label=labelMap[dotClass]||'等待';
-    var dotVisual=(dotClass==='running'||dotClass==='parsing'||dotClass==='downloading'||dotClass==='generating')?'running':dotClass;
-    var urlDisplay=l.url.length>45?l.url.slice(0,45)+'\u2026':l.url;
-    var platform=detectPlatform(l.url);
-    html+='<div class="queue-item"><span class="dot '+dotVisual+'"></span><span class="info"><small style="color:#8e8e93">['+platform+']</small> '+urlDisplay+'</span><span class="tag">'+label+'</span><button class="del" onclick="removeLink('+i+')" '+(isGenerating?'disabled':'')+'>&#x2715;</button></div>';
-  }
-  list.innerHTML=html;
-  document.getElementById('linkCount').textContent=links.length+' 个';
-  if(!isGenerating)document.getElementById('genBtn').textContent='\u{1F3AC} 开始生成（'+links.length+'）';
-}
-
-function renderHistory(){
-  var l=document.getElementById('historyList');
-  if(!l)return;
-  if(history.length===0){
-    l.innerHTML='<div class="queue-empty"><i>\u{1F4CB}</i><p>暂无历史记录</p></div>';
-    document.getElementById('historyCount').textContent='0';
-    return;
-  }
-  var html='';
-  for(var i=0;i<history.length;i++){
-    var item=history[i];
-    var dateStr='';
-    try{var d=new Date(item.created_at);dateStr=d.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}catch(e){dateStr=item.created_at;}
-    var isActive=currentScriptId===item.id;
-    html+='<div class="queue-item" style="cursor:pointer'+(isActive?';background:#f0f0ff':'')+'" onclick="loadScript(\''+item.id+'\',\''+escapeHtml(item.title)+'\')"><span class="dot '+(item.status==='done'?'done':'fail')+'"></span><span class="info">'+escapeHtml(item.title)+'</span><span class="tag">'+dateStr+'</span></div>';
-  }
-  l.innerHTML=html;
-  document.getElementById('historyCount').textContent=history.length;
-}
-
-function escapeHtml(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-
-function addLink(){var input=document.getElementById('linkInput');var val=input.value.trim();if(!val)return;links.push({url:val,status:'wait'});input.value='';input.focus();renderLinks();}
-function removeLink(i){if(isGenerating)return;links.splice(i,1);renderLinks();}
-function clearAll(){if(isGenerating)return;links=[];renderLinks();}
-
-function startGenerate(){
-  if(isGenerating||links.length===0)return;
-  var pending=links.filter(function(l){return l.status==='wait'||l.status==='fail';});
-  if(pending.length===0){toast('没有待生成的链接');return;}
-  links.forEach(function(l){if(l.status==='fail')l.status='wait';});
-  isGenerating=true;
-  var btn=document.getElementById('genBtn');
-  btn.disabled=true;btn.textContent='\u23F3 生成中 \u2026';
-  document.getElementById('progressBar').style.display='block';
-  document.getElementById('progressInfo').style.display='flex';
-  document.getElementById('progressFill').style.width='0%';
-  var total=links.filter(function(l){return l.status==='wait';}).length;
-  document.getElementById('progressText').textContent='0 / '+total;
-  document.getElementById('progressPct').textContent='0%';
-  var urls=links.filter(function(l){return l.status==='wait';}).map(function(l){return l.url;});
-
-  fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({links:urls})})
-  .then(function(response){
-    var reader=response.body.getReader();
-    var decoder=new TextDecoder();
-    var buffer='';
-    var doneCount=0,failCount=0;
-    var waitLinks=links.filter(function(l){return l.status==='wait';});
-    function read(){
-      reader.read().then(function(result){
-        if(result.done){finishGen(doneCount,failCount);return;}
-        buffer+=decoder.decode(result.value,{stream:true});
-        var lines=buffer.split('\n');buffer=lines.pop();
-        for(var i=0;i<lines.length;i++){
-          var line=lines[i].trim();
-          if(!line.startsWith('data: '))continue;
-          try{
-            var data=JSON.parse(line.slice(6));
-            if(data.type==='progress'&&data.index!==undefined){
-              var linkIdx=links.indexOf(waitLinks[data.index]);
-              if(linkIdx>=0){
-                links[linkIdx].status=data.status;
-                if(data.status==='done')doneCount++;
-                else if(data.status==='failed'){failCount++;links[linkIdx].status='fail';}
-              }
-              renderLinks();
-              var pct=Math.round(((doneCount+failCount)/total)*100);
-              document.getElementById('progressFill').style.width=pct+'%';
-              document.getElementById('progressText').textContent=(doneCount+failCount)+' / '+total;
-              document.getElementById('progressPct').textContent=pct+'%';
-            }
-            if(data.type==='complete'){
-              finishGen(doneCount,failCount);
-              if(data.records&&data.records.length>0){
-                var first=data.records.find(function(r){return r.status==='done';});
-                if(first)loadScript(first.id,first.title);
-              }
-              return;
-            }
-          }catch(e){}
-        }
-        read();
-      });
-    }
-    read();
-  }).catch(function(err){toast('生成请求失败: '+err.message);isGenerating=false;btn.disabled=false;btn.textContent='\u{1F3AC} 开始生成';});
-}
-
-function finishGen(doneCount,failCount){
-  isGenerating=false;
-  var btn=document.getElementById('genBtn');
-  btn.disabled=false;btn.textContent='\u{1F3AC} 开始生成';
-  document.getElementById('progressFill').style.width='100%';
-  if(doneCount>0)toast('\u2705 生成完成'+(failCount>0?'，'+failCount+' 个失败':''));
-  else if(failCount>0)toast('\u274C 生成失败');
-  loadHistory();renderLinks();
-}
-
-function loadHistory(){
-  fetch('/api/history?page=1&page_size=50').then(function(r){return r.json();}).then(function(data){history=data.items||[];renderHistory();}).catch(function(){history=[];renderHistory();});
-}
-
-function loadScript(id,title){
-  currentScriptId=id;
-  document.getElementById('resultTitle').innerHTML='\u{1F4C4} '+escapeHtml(title);
-  document.getElementById('scriptArea').textContent='加载中\u2026';
-  fetch('/api/scripts/'+id).then(function(r){if(!r.ok)throw new Error('Not found');return r.json();}).then(function(data){
-    document.getElementById('scriptArea').textContent=data.output;
-    document.getElementById('charCount').textContent=data.output.length;
-    renderHistory();
-  }).catch(function(){document.getElementById('scriptArea').textContent='(暂无内容)';document.getElementById('charCount').textContent='0';});
-}
-
-function downloadDocx(){if(!currentScriptId){toast('请先选择一个剧本');return;}window.open('/api/scripts/'+currentScriptId+'/download?format=docx','_blank');}
-function downloadTxt(){if(!currentScriptId){toast('请先选择一个剧本');return;}window.open('/api/scripts/'+currentScriptId+'/download?format=txt','_blank');}
-
-function showSettings(){document.getElementById('settingsModal').classList.add('show');}
-function hideSettings(){document.getElementById('settingsModal').classList.remove('show');}
-
-function loadSettings(){
-  fetch('/api/settings').then(function(r){return r.json();}).then(function(data){
-    document.getElementById('apiUrl').value=data.api_base_url||'';
-    document.getElementById('apiKey').value='';
-    document.getElementById('apiKey').placeholder=data.api_key||'输入你的 API Key';
-    if(data.model_name){_pendingModelName=data.model_name;if(data.api_base_url&&data.api_key)fetchModels();}
-  }).catch(function(){});
-}
-
-function saveSettings(){
-  var url=document.getElementById('apiUrl').value.trim();
-  var key=document.getElementById('apiKey').value.trim();
-  if(!url){toast('请填写 API Base URL');return;}
-  var model=document.getElementById('modelName').value||'gemini-1.5-pro';
-  var payload={api_base_url:url,api_key:key||'****',model_name:model,prompt_template:'default'};
-  fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-  .then(function(r){return r.json();}).then(function(){hideSettings();toast('\u2705 设置已保存');loadSettings();}).catch(function(err){toast('保存失败: '+err.message);});
-}
-
-function fetchModels(){
-  var baseUrl=document.getElementById('apiUrl').value.trim();
-  var key=document.getElementById('apiKey').value.trim();
-  if(!baseUrl&&!key){toast('请先填写 API Base URL 和 Key');return;}
-  var params='';
-  if(baseUrl)params+='api_base_url='+encodeURIComponent(baseUrl);
-  if(key)params+=(params?'&':'')+'api_key='+encodeURIComponent(key);
-  var select=document.getElementById('modelName');
-  select.innerHTML='<option value="">加载中...</option>';
-  fetch('/api/models?'+params).then(function(r){return r.json();}).then(function(data){
-    if(data.error){toast('获取失败: '+data.error);select.innerHTML='<option value="">获取失败</option>';return;}
-    if(!data.models||data.models.length===0){select.innerHTML='<option value="">未找到模型</option>';return;}
-    var html='',target=_pendingModelName||'';
-    for(var i=0;i<data.models.length;i++){var m=data.models[i];var sel=(m===target)?' selected':'';html+='<option value="'+m+'"'+sel+'>'+m+'</option>';}
-    select.innerHTML=html;_pendingModelName='';
-    toast('已获取 '+data.models.length+' 个模型');
-  }).catch(function(err){toast('获取失败: '+err.message);select.innerHTML='<option value="">获取失败</option>';});
-}
-
-function toast(msg){var e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2500);}
-
-renderLinks();renderHistory();loadSettings();
-</script>
+<script src="/static/app.js"></script>
 </body>
 </html>

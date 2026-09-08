@@ -6,7 +6,7 @@ from openai import OpenAI
 from ..config import settings
 from ..prompt_template import MAHJONG_PROMPT
 
-FFMPEG = "C:\\Program Files\\EVCapture\\ffmpeg.exe"
+FFMPEG = "/usr/bin/ffmpeg"
 
 
 def generate_script(video_path: Path, custom_prompt: str = None) -> str:
@@ -90,3 +90,4 @@ def generate_script(video_path: Path, custom_prompt: str = None) -> str:
         )
         
         return response.choices[0].message.content
+
